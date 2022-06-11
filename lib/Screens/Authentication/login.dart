@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restapi_provider/Provider/AuthProvider/auth_provider.dart';
+import 'package:restapi_provider/Utils/snack_message.dart';
 import 'register.dart';
 import 'package:restapi_provider/Utils/routers.dart';
 import 'package:restapi_provider/Widgets/button.dart';
@@ -47,12 +50,38 @@ class _LoginPageState extends State<LoginPage> {
                  controller: _password,
                  hint: 'Enter your password',
                 ),
-               customButton(
-                 text: 'Login',
-                 tap: () {},
-               context: context,  
-                status: false, 
-                ),
+
+                //Button
+               Consumer<AuthenticationProvider>(
+                 builder: (context, auth, child) {
+                  WidgetsBinding.instance!.addPostFrameCallback((_) {
+                    if (auth.resMessage != '') {
+                       showMessage(
+                      message: auth.resMessage, context: context);
+                       auth.clear();
+                    }
+                  });
+                   return customButton(
+                     text: 'Login',
+                     tap: () {
+                       if (_email.text.isEmpty || _password.text.isEmpty) {
+                     showMessage(
+                       message: "All fields are required",
+                        context: context);
+
+                       } else {
+                         auth.loginUser(
+                           context: context,
+                           email: _email.text.trim(), 
+                           password: _password.text.trim(),
+                          );
+                       }
+                     },
+                   context: context,  
+                    status: auth.isLoading,
+                    );
+                 }
+               ),
                const SizedBox(height: 10,
                 ),
                 GestureDetector(

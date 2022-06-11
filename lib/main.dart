@@ -1,3 +1,7 @@
+import 'package:restapi_provider/Provider/AuthProvider/auth_provider.dart';
+import 'package:restapi_provider/Provider/Database/db_provider.dart';
+import 'package:restapi_provider/styles/colors.dart';
+
 import './splash.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +16,23 @@ class App extends StatelessWidget {
   @override
 
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: SplashScreen(),
+    return MultiProvider(
+      providers : [
+     ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
+     ChangeNotifierProvider(create: (_) => DatabaseProvider()),
+      ],
+      child :  MaterialApp(
+          theme: ThemeData(
+            appBarTheme: AppBarTheme(
+           color: primaryColor,
+            ),
+            floatingActionButtonTheme:
+             FloatingActionButtonThemeData(backgroundColor: primaryColor),
+          primaryColor: primaryColor,
+          ),
+          home: const SplashScreen(),
+        ),
+      
     );
   }
 }
