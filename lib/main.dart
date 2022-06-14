@@ -6,6 +6,9 @@ import './splash.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'Provider/TaskProvider/add_task_provider.dart';
+import 'Provider/TaskProvider/delete_task_provider.dart';
+
 void main() {
   runApp(const App());
 }
@@ -20,6 +23,8 @@ class App extends StatelessWidget {
       providers : [
      ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
      ChangeNotifierProvider(create: (_) => DatabaseProvider()),
+     ChangeNotifierProvider(create: (_) => AddTaskProvider()),
+     ChangeNotifierProvider(create: (_) => DeleteTaskProvider()),
       ],
       child :  MaterialApp(
           theme: ThemeData(

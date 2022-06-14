@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:restapi_provider/Provider/Database/db_provider.dart';
+import 'package:restapi_provider/Provider/TaskProvider/get_task_service.dart';
 import 'package:restapi_provider/Screens/TaskPage/Local_widget/task_view_container.dart';
 import 'package:restapi_provider/Utils/routers.dart';
+import 'package:restapi_provider/styles/colors.dart';
 
+import '../../Model/task_model.dart';
 import 'Local_widget/add_task_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,7 +16,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List task = [];
+
+     @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    GetUserTask().getTask();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,8 +41,16 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Container(
         padding: const EdgeInsets.all(16),
-        child: task.isNotEmpty
-        ? Center(
+        child: FutureBuilder<TaskModel>(
+          future: GetUserTask().getTask(),
+          builder: (context, snapshot) {
+         print(snapshot);
+          if(snapshot.hasError) {
+            return const Center(child: Text('Error Occured'));
+          }else if(snapshot.hasData) {
+            if(snapshot.data!.tasks == null) {
+     return
+         Center(
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,  
           children: [
@@ -47,30 +65,43 @@ class _HomePageState extends State<HomePage> {
           const  SizedBox(height: 15),
             GestureDetector(
               onTap: () {
-      PageNavigator(ctx: context).nextPage(page: const CreateTaskPage());       
+      PageNavigator(ctx: context).nextPage(
+        page: const CreateTaskPage());       
               },
-            child: const Text('Create a task'
+            child: Text('Create a task',
+            style: TextStyle(
+              fontSize: 18, color: grey
             ),
-            
-              ),
-          
+            ),
+            ),
           ],
           )
-        )
-      : ListView(
-        children: List.generate(5,(index) {
+         );
+      } else {
+        return ListView(
+        children: List.generate(snapshot.data!.tasks!.length,(index) {
+         final data = snapshot.data!.tasks![index];
           return TaskField(
             initial: "${index + 1}",
-            title: "Hello world",
-            subtitle: 'time',
+            title: data.title,
+            subtitle: data.startTime.toString(),
             isCompleted: false,
-            taskId: 'id',
+            taskId: data.id.toString(),
           );
-        }
-      )
-    ),
-  ),
-      floatingActionButton: FloatingActionButton(
+      }),
+    );
+      }
+      } else {
+       return Center(
+         child: CircularProgressIndicator(
+           color: primaryColor,
+         ),
+         );
+      }
+      }
+      ),
+      ),
+       floatingActionButton: FloatingActionButton(
         //mini: true,
         onPressed: () {
      PageNavigator(ctx: context).nextPage(page: const CreateTaskPage());
